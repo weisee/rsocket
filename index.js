@@ -56,7 +56,6 @@
       } else {
         sessionField = req.session[sessionFieldName];
       }
-      sessionField = req.session[moduleOptions.auth.sessionField];
       if (sessionField) {
         redis.set(key, sessionField);
       }

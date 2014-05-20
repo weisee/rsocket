@@ -42,7 +42,6 @@ module.exports =
       sessionField = req.session.passport[sessionFieldName];
     else
       sessionField = req.session[sessionFieldName];
-    sessionField = req.session[moduleOptions.auth.sessionField]
     redis.set(key, sessionField) if sessionField
     next()
 
