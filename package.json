@@ -1,0 +1,21 @@
+{
+  "name": "rsocket",
+  "author": {
+    "name": "Weisee"
+  },
+  "version": "0.0.1",
+  "description": "Wrapper for sockjs which provide rooms and emit functions",
+  "keywords": [
+    "websockets",
+    "websocket",
+    "rooms"
+  ],
+  "dependencies": {
+    "sockjs": "0.3",
+    "redis": "*",
+    "cookie": "0.1.0",
+    "winston": "*",
+    "winston-mongodb": "*"
+  },
+  "main": "index"
+}
