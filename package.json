@@ -1,8 +1,6 @@
 {
   "name": "rsocket",
-  "author": {
-    "name": "Weisee"
-  },
+  "author": "Weisee",
   "version": "0.0.1",
   "description": "Wrapper for sockjs which provide rooms and emit functions",
   "keywords": [
@@ -17,5 +15,18 @@
     "winston": "*",
     "winston-mongodb": "*"
   },
-  "main": "index"
+  "main": "index",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/weisee/rsocket.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/weisee/rsocket/issues"
+  },
+  "homepage": "https://github.com/weisee/rsocket"
 }

@@ -37,6 +37,11 @@ module.exports =
     key = hash.digest('hex')
     res.cookie(moduleOptions.auth.key, key)
     redis = moduleOptions.redis.client
+    sessionFieldName = moduleOptions.auth.sessionField
+    if (req.session.passport) 
+      sessionField = req.session.passport[sessionFieldName];
+    else
+      sessionField = req.session[sessionFieldName];
     sessionField = req.session[moduleOptions.auth.sessionField]
     redis.set(key, sessionField) if sessionField
     next()
