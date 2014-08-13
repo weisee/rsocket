@@ -13,7 +13,8 @@
     "redis": "*",
     "cookie": "0.1.0",
     "winston": "*",
-    "winston-mongodb": "*"
+    "winston-mongodb": "*",
+    "lodash": "*"
   },
   "main": "index",
   "devDependencies": {},

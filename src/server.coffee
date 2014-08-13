@@ -28,6 +28,8 @@ Server = (options) ->
     "ROOM_EMIT": 1
     "SOCKET_EMIT": 2
     "SOCKET_REMOVE_FROM_ROOM": 3
+    "SOCKET_REMOVE_FROM_ROOMS": 4
+
 
 
   @sockets = 
@@ -39,11 +41,16 @@ Server = (options) ->
       if not room
         room = _createRoom roomName
       return room
-
+    
     removeSocketFromRoom: (socketId, room) =>
       @.sendMessage @.MSG_TYPES.SOCKET_REMOVE_FROM_ROOM, 
         socket: socketId
         room: room
+
+    removeSocketFromRooms: (socketId, rooms) =>
+      @.sendMessage @.MSG_TYPES.SOCKET_REMOVE_FROM_ROOMS, 
+        socket: socketId
+        rooms: rooms
 
     emitTo: (socketId, label, data) =>
       @.sendMessage @.MSG_TYPES.SOCKET_EMIT, 
@@ -54,33 +61,49 @@ Server = (options) ->
   @subRedis.subscribe(serverSubscribeChannelName)
   @subRedis.on 'message', (channel, message) =>
     message = JSON.parse message
-    if message.type is @MSG_TYPES.ROOM_EMIT
-      body = message.data
-      roomName = body.room
-      room = @rooms[roomName]
-      return false if not room
-      clients = room.getClients (err, clients) =>
-        throw new Error if err
-        defaultRoom = @rooms[""]
+    switch message.type
+
+      when @MSG_TYPES.ROOM_EMIT
+
+        body = message.data
+        roomName = body.room
+        room = @rooms[roomName]
+        return false if not room
+        clients = room.getClients (err, clients) =>
+          throw new Error if err
+          defaultRoom = @rooms[""]
+          messageLabel = body.label
+          messageData = body.data
+          for client in clients
+            socket = defaultRoom[client]
+            continue if not socket
+            socket.emit(messageLabel, messageData)
+
+      when @MSG_TYPES.SOCKET_EMIT
+
+        body = message.data
+        socketId = body.socket
+        socket = @rooms[""][socketId]
+        return false if not socket
         messageLabel = body.label
         messageData = body.data
-        for client in clients
-          socket = defaultRoom[client]
-          continue if not socket
-          socket.emit(messageLabel, messageData)
-    if message.type is @MSG_TYPES.SOCKET_EMIT
-      body = message.data
-      socketId = body.socket
-      socket = @rooms[""][socketId]
-      return false if not socket
-      messageLabel = body.label
-      messageData = body.data
-      socket.emit(messageLabel, messageData)
-    if message.type is @MSG_TYPES.SOCKET_EMIT
-      body = message.data
-      socketId = body.socket
-      room = body.room
-      @removeFromRoom socketId, room
+        socket.emit(messageLabel, messageData)
+
+      when @MSG_TYPES.SOCKET_REMOVE_FROM_ROOM
+
+        body = message.data
+        socketId = body.socket
+        room = body.room
+        @removeFromRoom socketId, room
+
+      when @MSG_TYPES.SOCKET_REMOVE_FROM_ROOMS
+
+        body = message.data
+        socketId = body.socket
+        rooms = body.rooms
+        console.log 'ROOMS', rooms
+        for room in rooms
+          @removeFromRoom socketId, room
 
   @activateSocket = (socket, sessionData) ->
     socket._activate(sessionData)
