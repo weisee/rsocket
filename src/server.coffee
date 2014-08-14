@@ -25,10 +25,12 @@ Server = (options) ->
   }
 
   @MSG_TYPES = 
-    "ROOM_EMIT": 1
-    "SOCKET_EMIT": 2
-    "SOCKET_REMOVE_FROM_ROOM": 3
-    "SOCKET_REMOVE_FROM_ROOMS": 4
+    'ROOM_EMIT': 1
+    'SOCKET_EMIT': 2
+    'SOCKET_REMOVE_FROM_ROOM': 3
+    'SOCKET_REMOVE_FROM_ROOMS': 4
+    'SOCKET_LEAVE_ROOM_BY_REG': 5
+    'SOCKET_ADD_TO_ROOM': 6
 
 
 
@@ -57,6 +59,16 @@ Server = (options) ->
         socket: socketId
         label: label
         data: data
+
+    leaveRoomsByReg: (socketId, regStr) =>
+      @.sendMessage @.MSG_TYPES.SOCKET_LEAVE_ROOM_BY_REG, 
+        socket: socketId
+        regStr: regStr
+
+    addSocketToRoom: (socketId, room) =>
+      @.sendMessage @.MSG_TYPES.SOCKET_ADD_TO_ROOM, 
+        socket: socketId
+        room: room
 
   @subRedis.subscribe(serverSubscribeChannelName)
   @subRedis.on 'message', (channel, message) =>
@@ -105,6 +117,18 @@ Server = (options) ->
         for room in rooms
           @removeFromRoom socketId, room
 
+      when @MSG_TYPES.SOCKET_LEAVE_ROOM_BY_REG
+        body = message.data
+        socketId = body.socket
+        regStr = body.regStr
+        @leaveRoomByReg socketId, regStr
+
+      when @MSG_TYPES.SOCKET_ADD_TO_ROOM
+        body = message.data
+        socketId = body.socket
+        roomName = body.room
+        @addSocketToRoom socketId, roomName
+
   @activateSocket = (socket, sessionData) ->
     socket._activate(sessionData)
 
@@ -123,6 +147,11 @@ Server = (options) ->
   _createRoom = (name) =>
     return new Room name: name, server: @
 
+  @addSocketToRoom = (socketId, roomName) =>
+    socket = @rooms[""][socketId]
+    return false if not socket
+    @addToRoom socket, roomName
+
   @addToRoom = (socket, roomName) =>
     room = @rooms[roomName]
     if not room
@@ -130,14 +159,19 @@ Server = (options) ->
     room.add socket
 
   @removeFromRoom = (socket, roomName) =>
-    if not socket.id
-      socket = @rooms[""][socket]
-    if not socket
-      return false
+    socket = @rooms[""][socket] if not socket.id
+    return false if not socket
     room = @rooms[roomName]
     if not room
       room = @rooms[roomName] = _createRoom roomName
     room.remove socket
+
+  @leaveRoomByReg = (socketId, regStr) =>
+    socket = @rooms[""][socketId]
+    return false if not socket
+    regExp = new RegExp regStr
+    socket.leaveByReg regExp , () ->
+      console.log 'removed from room by reg ' + regStr
 
   @
 
