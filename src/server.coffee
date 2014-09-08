@@ -73,6 +73,7 @@ Server = (options) ->
   @subRedis.subscribe(serverSubscribeChannelName)
   @subRedis.on 'message', (channel, message) =>
     message = JSON.parse message
+    console.log 'NEW MESSAGE:', message
     switch message.type
 
       when @MSG_TYPES.ROOM_EMIT

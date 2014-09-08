@@ -22,6 +22,7 @@ Room = (options) ->
       socket.rooms.splice(index, 1) if index >= 0
 
   @emit = (label, data) ->
+    console.log 'ROOM EMIT', @name, label
     @server.sendMessage @server.MSG_TYPES.ROOM_EMIT, 
       room: @name
       label: label
