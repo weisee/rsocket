@@ -71,6 +71,8 @@ Server = (options) ->
         room: room
 
   @subRedis.subscribe(serverSubscribeChannelName)
+  console.log @subRedis
+  console.log 'SUBSCRIBE ON', serverSubscribeChannelName
   @subRedis.on 'message', (channel, message) =>
     message = JSON.parse message
     console.log 'NEW MESSAGE:', message
