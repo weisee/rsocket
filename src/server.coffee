@@ -71,11 +71,10 @@ Server = (options) ->
         room: room
 
   @subRedis.subscribe(serverSubscribeChannelName)
-  console.log @subRedis
-  console.log 'SUBSCRIBE ON', serverSubscribeChannelName
+  subRedisStream = @subRedis.stream
+  console.log "Socket redis connected to #{subRedisStream.host}:#{subRedisStream.port}"
   @subRedis.on 'message', (channel, message) =>
     message = JSON.parse message
-    console.log 'NEW MESSAGE:', message
     switch message.type
 
       when @MSG_TYPES.ROOM_EMIT
@@ -116,7 +115,6 @@ Server = (options) ->
         body = message.data
         socketId = body.socket
         rooms = body.rooms
-        console.log 'ROOMS', rooms
         for room in rooms
           @removeFromRoom socketId, room
 
