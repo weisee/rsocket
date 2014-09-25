@@ -71,8 +71,7 @@ Server = (options) ->
         room: room
 
   @subRedis.subscribe(serverSubscribeChannelName)
-  subRedisStream = @subRedis.stream
-  console.log "Socket redis connected to #{subRedisStream.host}:#{subRedisStream.port}"
+  console.log "Socket redis connected to #{@subRedis.host}:#{@subRedis.port}"
   @subRedis.on 'message', (channel, message) =>
     message = JSON.parse message
     switch message.type
