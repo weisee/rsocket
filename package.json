@@ -14,7 +14,8 @@
     "cookie": "0.1.0",
     "winston": "*",
     "winston-mongodb": "*",
-    "lodash": "*"
+    "lodash": "*",
+    "async": "*"
   },
   "main": "index",
   "devDependencies": {},

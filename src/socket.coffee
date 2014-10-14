@@ -81,9 +81,7 @@ Socket = (conn, server) ->
       matchedRooms.push room if reg.test(room)
     @_leaveRooms matchedRooms, (err, replies) =>
       return done err if err
-      console.log 'rooms before', @rooms
       @rooms = _.difference @rooms, matchedRooms
-      console.log 'rooms after', @rooms
       done null, matchedRooms
 
   @_activate = (sessionData) =>

@@ -170,8 +170,8 @@ Server = (options) ->
     socket = @rooms[""][socketId]
     return false if not socket
     regExp = new RegExp regStr
-    socket.leaveByReg regExp , () ->
-      console.log 'removed from room by reg ' + regStr
+    socket.leaveByReg regExp , (err) ->
+      console.error err if err
 
   @
 
